@@ -1,5 +1,6 @@
 const test = (req,res)=>{
-    res.send("Hello world!!!")
+    console.log("server hit")
+    res.json("This is a test route.")
 }
 
 
