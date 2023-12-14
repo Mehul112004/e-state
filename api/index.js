@@ -10,7 +10,7 @@ console.log(process.env.MONGO)
 
 const app = express();
 app.use(express.json())
-app.use(cors())
+app.use(cors());
 
 
 mongoose.connect(process.env.MONGO)
@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO)
         app.use('/api/auth', authRouter)
 
         app.use((err, req, res, next) => {
-            console.log("In the error handler middleware")
+            console.log("In the error handler middleware in index.js file")
             const statusCode = err.statusCode || 500;
             const message = err.message || "Something went wrong";
             res.status(statusCode).json({

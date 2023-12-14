@@ -6,6 +6,7 @@ import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
 import SignUp from "./pages/SignUp";
+import DeleteUser from "./pages/DeleteUser";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/delete" element={<DeleteUser />} />
       </Routes>
     </BrowserRouter>
   );
