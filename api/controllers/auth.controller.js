@@ -21,22 +21,26 @@ export const signUp = async (req, res, next) => {
 export const signIn = async (req, res, next) => {
     console.log(`Trying to sign in with details : ${req.body}`);
     const { email, password } = req.body;
-    try {
-        const validUser = await User.findOne({ email });
-        console.log(validUser);
-        if (!validUser)
-            next(errorHandler(404, "User not found"));
-        const validPassword = bcrypt.compareSync(password, validUser.password);
-        if (!validPassword)
-            next(errorHandler(401, "Invalid credentials"));
-        console.log("user signed in successfully ");
-        const token = jwt.sign({ email: validUser.email }, process.env.JWT_SECRET)
-        console.log(token);
-        const { password: pass, ...rest }= validUser._doc;
-        res.cookie("token", token, { httpOnly: true }).status(200).json({ message: "user signed in", rest });
-    }
-    catch (error) {
-        next(error);
+    if (email && password) {
+        console.log(email, password);
+        try {
+            const validUser = await User.findOne({ email });
+            console.log(validUser);
+            if (!validUser)
+                next(errorHandler(404, "User not found"));
+            const validPassword = bcrypt.compareSync(password, validUser.password);
+            if (!validPassword)
+                next(errorHandler(401, "Invalid credentials"));
+            console.log("user signed in successfully ");
+            const token = jwt.sign({ email: validUser.email }, process.env.JWT_SECRET)
+            console.log(token);
+            const { password: pass, ...rest } = validUser._doc;
+            res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" }).status(200).json({ message: "user signed in", rest });
+        }
+        catch (error) {
+            next(error);
+
+        }
     }
 }
 

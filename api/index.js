@@ -10,7 +10,7 @@ console.log(process.env.MONGO)
 
 const app = express();
 app.use(express.json())
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
 
 
 mongoose.connect(process.env.MONGO)

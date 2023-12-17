@@ -1,10 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { signInFailure,signInStart,signInSuccess } from "../redux/user/userSlice";
+
 function SignIn() {
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const {loading, error} =useSelector((state)=>state.user)
   const navigate = useNavigate()
+  const dispatch = useDispatch();
 
   //store the form data in state
   const handleChange = (e) => {
@@ -15,7 +18,7 @@ function SignIn() {
   //send the requet to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    dispatch(signInStart());
     try {
       const res = await fetch("http://localhost:3000/api/auth/sign-in", {
       method: "POST",
@@ -23,21 +26,19 @@ function SignIn() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
+      credentials: 'include',
     });
     const data = await res.json();
     console.log(data);
     if(data.success === false){
-      setError(data.message)
-      setLoading(false)
+      dispatch(signInFailure(data.message))
       return;
     }
-    setLoading(false)
-    setError(null)
+    dispatch(signInSuccess(data))
     navigate('/')
     console.log(data);
     } catch (error) {
-      setError(error.message)
-      setLoading(false)
+      dispatch(signInFailure(error.message))
     }
     
   };
@@ -56,6 +57,7 @@ function SignIn() {
           autoComplete="off"
           id="email"
           onChange={handleChange}
+          required={true}
         />
         <input
           type="password"
@@ -63,6 +65,7 @@ function SignIn() {
           className="border p-3 rounded-lg"
           id="password"
           onChange={handleChange}
+          required={true}
         />
         <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80" disabled={loading}>
           {loading ? "Loading..." : "Sign In"}
