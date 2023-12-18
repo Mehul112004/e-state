@@ -32,7 +32,7 @@ export const signIn = async (req, res, next) => {
             if (!validPassword)
                 next(errorHandler(401, "Invalid credentials"));
             console.log("user signed in successfully ");
-            const token = jwt.sign({ email: validUser.email }, process.env.JWT_SECRET)
+            const token = jwt.sign({ id: validUser.id }, process.env.JWT_SECRET)
             console.log(token);
             const { password: pass, ...rest } = validUser._doc;
             res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" }).status(200).json({ message: "user signed in", rest });
@@ -51,7 +51,7 @@ export const google = async (req, res, next) => {
         console.log(user);
         if (user) {
             console.log("inside if block")
-            const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
             const { password: pass, ...rest } = user._doc;
             res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
         } else {
@@ -62,7 +62,7 @@ export const google = async (req, res, next) => {
             await newUser.save();
 
             try {
-                const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET);
+                const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
                 const { password: pass, ...rest } = newUser._doc;
                 res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
             } catch (error) {
