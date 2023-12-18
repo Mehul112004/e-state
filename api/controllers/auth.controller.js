@@ -44,10 +44,33 @@ export const signIn = async (req, res, next) => {
     }
 }
 
-export const deleteUser = async (req, res, next) => {
-    console.log(`Trying to delete user with details : ${req.body}`);
-    const { email } = req.body;
-    console.log(email);
-    const response = await User.findOneAndDelete({ email });
-    console.log(response);
+export const google = async (req, res, next) => {
+    console.log("Google sign in");
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        console.log(user);
+        if (user) {
+            console.log("inside if block")
+            const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+            const { password: pass, ...rest } = user._doc;
+            res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
+        } else {
+            console.log("inside else block")
+            const password = Math.random().toString(36).slice(-8);
+            const hashedPassword = bcrypt.hashSync(password, 10);
+            const newUser = new User({ username: req.body.name.split(' ').join('').toLowerCase() + Math.random().toString(36).slice(-8), email: req.body.email, password: hashedPassword, avatar: req.body.photo })
+            await newUser.save();
+
+            try {
+                const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET);
+                const { password: pass, ...rest } = newUser._doc;
+                res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
+            } catch (error) {
+                console.log("Erorr signing jwt token to newUser", error);
+                next(errorHandler(400, "gadbad ho gya"))
+            }
+        }
+    } catch (error) {
+        next(errorHandler(400, "kuch toh gadbad hai daya"))
+    }
 }

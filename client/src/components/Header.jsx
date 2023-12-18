@@ -32,14 +32,14 @@ export default function Header() {
               About
             </li>
           </Link>
-          <Link to="/sign-in">
-            <li className="sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
-              Sign in
-            </li>
-          </Link>
           <Link to="/sign-up">
             <li className="sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
               Sign Up
+            </li>
+          </Link>
+          <Link to="/sign-in">
+            <li className="sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
+              Sign in
             </li>
           </Link>
         </ul>
