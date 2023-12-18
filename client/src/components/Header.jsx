@@ -23,7 +23,7 @@ export default function Header() {
             <FaSearch className="text-slate-200 hover:text-slate-500 hover:cursor-pointer " />
           </form>
         </div>
-        <ul className="flex gap-4">
+        <ul className="flex gap-4 justify-center items-center">
           <Link to="/">
             <li className="hidden sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
               Home
@@ -45,7 +45,7 @@ export default function Header() {
               <img
                 src={currentUser.rest.avatar}
                 alt="profile"
-                className="rounded-full h-7 w-7 object-cover"
+                className="rounded-full h-8 w-8 object-cover"
               />
             ) : (
               <li className="sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
