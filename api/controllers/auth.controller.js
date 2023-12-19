@@ -25,7 +25,6 @@ export const signIn = async (req, res, next) => {
         console.log(email, password);
         try {
             const validUser = await User.findOne({ email });
-            console.log(validUser);
             if (!validUser)
                 next(errorHandler(404, "User not found"));
             const validPassword = bcrypt.compareSync(password, validUser.password);
@@ -35,7 +34,7 @@ export const signIn = async (req, res, next) => {
             const token = jwt.sign({ id: validUser.id }, process.env.JWT_SECRET)
             console.log(token);
             const { password: pass, ...rest } = validUser._doc;
-            res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" }).status(200).json({ message: "user signed in", rest });
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json({ message: "user signed in", rest });
         }
         catch (error) {
             next(error);
@@ -53,7 +52,7 @@ export const google = async (req, res, next) => {
             console.log("inside if block")
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
             const { password: pass, ...rest } = user._doc;
-            res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json({ message: "user signed in", rest })
         } else {
             console.log("inside else block")
             const password = Math.random().toString(36).slice(-8);
@@ -64,7 +63,7 @@ export const google = async (req, res, next) => {
             try {
                 const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
                 const { password: pass, ...rest } = newUser._doc;
-                res.cookie("access_token", token, { httpOnly: true, sameSite: "none", secure: true }).status(200).json({ message: "user signed in", rest })
+                res.cookie("access_token", token, { httpOnly: true }).status(200).json({ message: "user signed in", rest })
             } catch (error) {
                 console.log("Erorr signing jwt token to newUser", error);
                 next(errorHandler(400, "gadbad ho gya"))
@@ -72,5 +71,14 @@ export const google = async (req, res, next) => {
         }
     } catch (error) {
         next(errorHandler(400, "kuch toh gadbad hai daya"))
+    }
+}
+
+export const signOut = async (req, res, next) => {
+    try {
+        res.clearCookie("access_token");
+        res.status(200).json({ message: "user signed out" });
+    } catch (error) {
+        next(error)
     }
 }
