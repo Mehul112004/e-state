@@ -8,6 +8,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signOutStart, signOutFailure, signOutSuccess } from "../redux/user/userSlice";
+import {Link} from 'react-router-dom'
 
 function Profile() {
   const fileRef = useRef(null);
@@ -18,10 +19,6 @@ function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [editable, setEditable] = useState(false)
-
-  console.log(currentUser.rest._id);
-
-  console.log(formData);
 
   useEffect(() => {
     if (file) {
@@ -187,10 +184,17 @@ function Profile() {
         />
         <button 
         disabled={loading}
-        className="bg-slate-700 text-white hover:bg-slate-400 rounded-lg p-3 uppercase"
+        className="bg-slate-700 text-white hover:bg-slate-600 rounded-lg p-3 uppercase"
         >
           {loading?'Updating...':'Update'}
         </button>
+
+        <Link
+        className="bg-green-500 rounded-lg p-3 font-semibold text-lg text-white hover:bg-green-400 text-center"
+        to='/create-listing'
+        >
+          Create Listing
+        </Link>
       </form>
 
       <div className=" flex justify-between mt-5">
