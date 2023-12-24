@@ -3,6 +3,12 @@ import { uploadBytesResumable } from "firebase/storage";
 import { getStorage, ref } from "firebase/storage";
 import { useState } from "react";
 import { app } from "../firebase";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  imageUploadFailure,
+  imageUploadStart,
+  imageUploadSuccess,
+} from "../redux/user/userSlice";
 
 function CreateListing() {
   const [files, setFiles] = useState([]);
@@ -10,12 +16,14 @@ function CreateListing() {
     imageUrls: [],
   });
   const [imageUploadError, setImageUploadError] = useState(false);
+  const { loading } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   console.log(files);
   console.log(formData.imageUrls.length);
 
   const handleImageSubmit = (e) => {
     e.preventDefault();
-    if (files.length > 0 && files.length + formData.imageUrls.length  < 7) {
+    if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       const promises = [];
       for (let i = 0; i < files.length; i++) {
         promises.push(storeImage(files[i]));
@@ -46,19 +54,30 @@ function CreateListing() {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
+          dispatch(imageUploadStart());
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
+          dispatch(imageUploadFailure(error));
           reject(error);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             resolve(downloadURL);
+            dispatch(imageUploadSuccess());
           });
         }
       );
+    });
+  };
+
+  const handleRemoveImage = (index) => {
+    // e.preventDefault();
+    setFormData({
+      ...formData,
+      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
 
@@ -192,8 +211,9 @@ function CreateListing() {
               className="px-2 py-1 border text-green-700 border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
               onClick={handleImageSubmit}
               type="button"
+              disabled={loading}
             >
-              Upload
+              {!loading ? "Upload" : "Uploading..."}
             </button>
           </div>
           <button className="p-3 bg-slate-600 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
@@ -207,15 +227,21 @@ function CreateListing() {
               formData.imageUrls.map((url, index) => {
                 return (
                   <div
-                    className="flex justify-between p-3 border items-center max-w-md"
-                    key={index}
+                    className="flex justify-between p-3 border items-center max-w-md gap-2"
+                    key={url}
                   >
                     <img
                       src={url}
                       alt="Listing image"
                       className="w-20 h-20 object-contain rounded-xl"
                     />
-                    <button className="p-3 text-red-500 rounded-lg uppercase hover:opacity-75">
+                    <button
+                      className="px-2 py-1 text-white  rounded-lg uppercase hover:opacity-75 hover:text-red-600 hover:bg-white hover:border hover:border-black bg-red-600 transition duration-100 focus:scale-90"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleRemoveImage(index);
+                      }}
+                    >
                       Delete
                     </button>
                   </div>

@@ -35,12 +35,6 @@ export default function Header() {
               About
             </li>
           </Link>
-          {currentUser ? null : (<Link to="/sign-up">
-            <li className="sm:inline text-slate-500 hover:text-black hover:cursor-pointer">
-              Sign Up
-            </li>
-          </Link>)}
-          
           <Link to="/profile">
             {currentUser ? (
               <img
