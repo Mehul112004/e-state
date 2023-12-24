@@ -19,6 +19,8 @@ function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [editable, setEditable] = useState(false)
+  console.log(currentUser);
+  console.log(formData);
 
   useEffect(() => {
     if (file) {
@@ -36,6 +38,7 @@ function Profile() {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
+        dispatch(updateUserStart())
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setFileProgress(Math.round(progress));
@@ -46,6 +49,8 @@ function Profile() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData({ ...formData, avatar: downloadURL });
+          console.log(formData);
+          dispatch(updateUserSuccess({...currentUser,formData}))
         });
       }
     );
@@ -125,7 +130,7 @@ function Profile() {
           onChange={(e) => setFile(e.target.files[0])}
         />
         <img
-          src={formData?.avatar||currentUser.rest.avatar}
+          src={formData.avatar||currentUser.rest.avatar}
           alt="Profile picture"
           className=" rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-4"
           onClick={() => fileRef.current.click()}
@@ -186,7 +191,7 @@ function Profile() {
         disabled={loading}
         className="bg-slate-700 text-white hover:bg-slate-600 rounded-lg p-3 uppercase"
         >
-          {loading?'Updating...':'Update'}
+          Update
         </button>
 
         <Link
